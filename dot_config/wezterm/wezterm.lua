@@ -1,24 +1,22 @@
 local wezterm = require 'wezterm'
+local config = {}
 
--- Use the config_builder which helps provide clearer error messages
-local config = wezterm.config_builder()
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
 
--- Color scheme and appearance
-config.color_scheme = 'Lavandula'
--- config.color_scheme = 'Catppuccin Mocha' -- Original scheme commented out
-config.window_background_opacity = 0.95
-config.font = wezterm.font_with_fallback {
-  'JetBrains Mono',
-  'Menlo', -- Common on macOS
-  'Consolas', -- Common on Windows
-  -- Add more fallbacks if needed, e.g., 'DejaVu Sans Mono', 'Noto Mono'
-}
-config.font_size = 14.0
-config.window_padding = {
-  left = 4,
-  right = 4,
-  top = 4,
-  bottom = 4,
-}
+-- Modern, safe configuration
+config.color_scheme = "Catppuccin Mocha"
+config.font = wezterm.font_with_fallback({
+  "JetBrains Mono",
+  "Fira Code",
+  "Consolas",
+})
+config.font_size = 12.0
+config.window_padding = { left = 2, right = 2, top = 2, bottom = 2 }
+config.enable_tab_bar = true
+config.hide_tab_bar_if_only_one_tab = true
+config.use_fancy_tab_bar = true
+config.tab_bar_at_bottom = true
 
 return config

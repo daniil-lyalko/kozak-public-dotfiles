@@ -149,7 +149,7 @@ if [[ "$INSTALL_WEZTERM" == "true" ]]; then
 
     # Check if running in WSL
     if grep -q -i "microsoft" /proc/version 2>/dev/null; then
-        log "WSL detected..."
+        log "WSL detected - WezTerm config managed by chezmoi"
         
         # Install WSL-specific dependencies if needed
         if command_exists apt && ! command_exists wezterm; then
@@ -159,49 +159,6 @@ if [[ "$INSTALL_WEZTERM" == "true" ]]; then
                 sudo apt install -y libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
                     libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 \
                     libxkbcommon-x11-0 || log "Warning: Some dependencies failed to install"
-            fi
-        fi
-
-        # Create WezTerm config
-        WEZTERM_CONFIG="$HOME/.config/wezterm/wezterm.lua"
-        if [ ! -f "$WEZTERM_CONFIG" ]; then
-            mkdir -p "$HOME/.config/wezterm"
-            log "Creating WezTerm configuration..."
-            cat > "$WEZTERM_CONFIG" << 'EOF'
-local wezterm = require 'wezterm'
-local config = {}
-
-if wezterm.config_builder then
-  config = wezterm.config_builder()
-end
-
--- Modern, safe configuration
-config.color_scheme = "Catppuccin Mocha"
-config.font = wezterm.font_with_fallback({
-  "JetBrains Mono",
-  "Fira Code",
-  "Consolas",
-})
-config.font_size = 12.0
-config.window_padding = { left = 2, right = 2, top = 2, bottom = 2 }
-config.enable_tab_bar = true
-config.hide_tab_bar_if_only_one_tab = true
-config.use_fancy_tab_bar = true
-config.tab_bar_at_bottom = true
-
-return config
-EOF
-        else
-            log "WezTerm config already exists, skipping"
-        fi
-
-        # Try to copy config to Windows (best effort)
-        if [ -f "$WEZTERM_CONFIG" ]; then
-            WINDOWS_USERNAME=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n' || echo "unknown")
-            if [ "$WINDOWS_USERNAME" != "unknown" ] && [ -d "/mnt/c/Users/${WINDOWS_USERNAME}" ]; then
-                WINDOWS_CONFIG="/mnt/c/Users/${WINDOWS_USERNAME}/.wezterm.lua"
-                log "Copying WezTerm config to Windows..."
-                cp "$WEZTERM_CONFIG" "$WINDOWS_CONFIG" 2>/dev/null || log "Note: Could not copy config to Windows (this is optional)"
             fi
         fi
     else
@@ -242,7 +199,7 @@ $(if [[ "$INSTALL_WEZTERM" == "true" ]]; then echo "✅ WezTerm configured"; fi)
 
 🔧 Configuration Files:
    - Shell: ~/.zshrc (managed by chezmoi)
-   - WezTerm: ~/.config/wezterm/wezterm.lua
+   - WezTerm: ~/.config/wezterm/wezterm.lua (managed by chezmoi)
    - Git: ~/.gitconfig (managed by chezmoi)
 
 For more information: https://github.com/kozakdaniil/kozak-public-dotfiles
