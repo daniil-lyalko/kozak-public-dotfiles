@@ -19,4 +19,47 @@ config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = true
 
+-- Performance optimizations
+config.max_fps = 120
+config.animation_fps = 60
+config.cursor_blink_rate = 800
+
+-- WSL integration (automatically detect and use WSL)
+if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
+  config.default_domain = 'WSL:Debian'
+  config.wsl_domains = {
+    {
+      name = 'WSL:Debian',
+      distribution = 'Debian',
+      username = 'kozak',
+      default_cwd = '/home/kozak',
+    },
+  }
+end
+
+-- Useful key bindings
+config.keys = {
+  -- Split panes
+  { key = 'd', mods = 'CTRL|SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'D', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  
+  -- Navigate panes
+  { key = 'h', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
+  { key = 'l', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Right' },
+  { key = 'k', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'j', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Down' },
+  
+  -- Close pane
+  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentPane { confirm = true } },
+}
+
+-- Mouse bindings for better copy/paste
+config.mouse_bindings = {
+  {
+    event = { Up = { streak = 1, button = 'Left' } },
+    mods = 'CTRL',
+    action = wezterm.action.OpenLinkAtMouseCursor,
+  },
+}
+
 return config
