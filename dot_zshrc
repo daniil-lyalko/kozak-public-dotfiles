@@ -110,6 +110,8 @@ if [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
     . "/opt/homebrew/opt/nvm/nvm.sh"  # macOS Homebrew (Apple Silicon)
 elif [ -s "/usr/local/opt/nvm/nvm.sh" ]; then
     . "/usr/local/opt/nvm/nvm.sh"  # macOS Homebrew (Intel)
+elif [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ]; then
+    . "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # Linux Homebrew
 elif [ -s "$NVM_DIR/nvm.sh" ]; then
     . "$NVM_DIR/nvm.sh"  # Linux/WSL2 / Manual Install
 fi
