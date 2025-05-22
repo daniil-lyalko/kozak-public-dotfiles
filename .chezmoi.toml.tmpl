@@ -1,0 +1,48 @@
+# -*-mode:toml-*- vim:ft=toml
+# -*-mode:go-template-*- vim:ft=toml
+
+# ~/.config/chezmoi/chezmoi.toml.tmpl
+# =============================================================================
+# Used to customize configuration when doing a `chezmoi init`.
+# This template file will trigger prompts for the user to fill in
+# their specific values.
+# See https://www.chezmoi.io/docs/how-to/
+
+{{ $email := promptStringOnce . "email" "Enter your Git commit email address" }}
+{{ $name := promptStringOnce . "name" "Enter your Git commit name" }}
+{{ $signingkey := promptStringOnce . "signingkey" "Enter your Git signing key (optional, press Enter to skip)" "" }}
+
+{{ $is_wsl := and (eq .chezmoi.os "linux") ((.chezmoi.kernel.osrelease | lower) | contains "microsoft") }}
+
+{{- $osid := .chezmoi.os -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}
+{{-   $osid = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+format = "json"
+color = "on"
+umask = 0o022
+progress = true
+
+[data]
+    email = {{ $email | quote }}
+    name = {{ $name | quote }}
+    signingkey = {{ $signingkey | quote }}
+    osid = {{ $osid | quote }}
+    is_wsl = {{ $is_wsl }}
+
+# Generic clipboard commands (assuming xclip is installed via install-packages.sh)
+[data.clipboard]
+    copy_command = "xclip -selection clipboard"
+    paste_command = "xclip -selection clipboard -o"
+    use_system = true
+
+[diff]
+    exclude = ["scripts"]
+
+[merge]
+    command = "nvim"
+    args = ["-d"]
+
+[status]
+    exclude = ["scripts"]

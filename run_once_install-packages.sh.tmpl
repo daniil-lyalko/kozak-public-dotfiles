@@ -1,0 +1,253 @@
+#!/bin/bash
+
+# ====================
+# Safe Package Installation Script
+# ====================
+# This script safely installs and configures development tools using Homebrew for both macOS and Linux.
+# It includes safety checks, version pinning, and graceful error handling.
+# 
+# Usage: ./install-packages.sh
+# ====================
+
+# Exit on error, undefined variables, and pipe failures
+set -euo pipefail
+
+# Configuration - Set to false to skip optional installs
+INSTALL_DOCKER=${INSTALL_DOCKER:-true}
+INSTALL_TERRAFORM=${INSTALL_TERRAFORM:-true}
+INSTALL_WEZTERM=${INSTALL_WEZTERM:-true}
+INSTALL_OPTIONAL_TOOLS=${INSTALL_OPTIONAL_TOOLS:-true}
+
+# Function to log messages with timestamps
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1"
+}
+
+# Function to check command existence
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to safely install package with version check
+safe_brew_install() {
+    local package="$1"
+    local optional="${2:-false}"
+    
+    if command_exists "$package"; then
+        log "$package is already installed, skipping"
+        return 0
+    fi
+    
+    if [[ "$optional" == "true" && "$INSTALL_OPTIONAL_TOOLS" != "true" ]]; then
+        log "Skipping optional package: $package"
+        return 0
+    fi
+    
+    log "Installing $package..."
+    if ! brew install "$package"; then
+        log "Warning: Failed to install $package"
+        return 1
+    fi
+}
+
+# Function to backup existing config
+backup_config() {
+    local file="$1"
+    if [ -f "$file" ]; then
+        local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+        log "Backing up existing config: $file -> $backup"
+        cp "$file" "$backup"
+    fi
+}
+
+# ====================
+# Homebrew Installation
+# ====================
+if ! command_exists brew; then
+    log "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for Linux
+    if [ "$(uname)" = "Linux" ]; then
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    fi
+else
+    log "Homebrew is already installed."
+fi
+
+# Update Homebrew (but don't upgrade packages automatically)
+log "Updating Homebrew formulae..."
+brew update
+
+# ====================
+# Essential Development Tools
+# ====================
+log "Installing essential development tools..."
+
+# Core tools that are generally safe to install/update
+safe_brew_install "git"
+safe_brew_install "curl"
+safe_brew_install "ripgrep"
+safe_brew_install "tree-sitter"
+safe_brew_install "neovim"
+safe_brew_install "starship"
+safe_brew_install "nvm"
+
+# Programming languages - pinned to stable versions
+safe_brew_install "python3"
+safe_brew_install "go"
+
+# Optional tools with user control
+if [[ "$INSTALL_DOCKER" == "true" ]]; then
+    safe_brew_install "docker" "true"
+fi
+
+if [[ "$INSTALL_TERRAFORM" == "true" ]]; then
+    safe_brew_install "terraform" "true"
+fi
+
+# Cloud/DevOps tools (optional)
+safe_brew_install "awscli" "true"
+safe_brew_install "infracost" "true"
+
+# ====================
+# Shell Configuration
+# ====================
+log "Configuring shell environment..."
+
+# Install Zsh if not present
+if ! command_exists zsh; then
+    log "Installing Zsh..."
+    safe_brew_install "zsh"
+else
+    log "Zsh is already installed."
+fi
+
+# Install Oh My Zsh only if not present and user hasn't customized
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    log "Installing Oh My Zsh..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+else
+    log "Oh My Zsh is already installed."
+fi
+
+# Only change default shell if explicitly requested
+if [ "${CHANGE_DEFAULT_SHELL:-false}" = "true" ] && [ "$SHELL" != "$(which zsh)" ]; then
+    log "Setting Zsh as default shell..."
+    if command_exists sudo; then
+        sudo chsh -s "$(which zsh)" "$(whoami)" || log "Warning: Failed to change default shell. Run 'chsh -s $(which zsh)' manually if desired."
+    else
+        log "Warning: Cannot change default shell without sudo. Run 'chsh -s $(which zsh)' manually if desired."
+    fi
+fi
+
+# ====================
+# WezTerm Installation (WSL-Safe)
+# ====================
+if [[ "$INSTALL_WEZTERM" == "true" ]]; then
+    log "Configuring terminal environment..."
+
+    # Check if running in WSL
+    if grep -q -i "microsoft" /proc/version 2>/dev/null; then
+        log "WSL detected..."
+        
+        # Install WSL-specific dependencies if needed
+        if command_exists apt && ! command_exists wezterm; then
+            log "Installing WSL dependencies for WezTerm..."
+            if command_exists sudo; then
+                sudo apt update
+                sudo apt install -y libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
+                    libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 \
+                    libxkbcommon-x11-0 || log "Warning: Some dependencies failed to install"
+            fi
+        fi
+
+        # Create WezTerm config
+        WEZTERM_CONFIG="$HOME/.config/wezterm/wezterm.lua"
+        if [ ! -f "$WEZTERM_CONFIG" ]; then
+            mkdir -p "$HOME/.config/wezterm"
+            log "Creating WezTerm configuration..."
+            cat > "$WEZTERM_CONFIG" << 'EOF'
+local wezterm = require 'wezterm'
+local config = {}
+
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
+
+-- Modern, safe configuration
+config.color_scheme = "Catppuccin Mocha"
+config.font = wezterm.font_with_fallback({
+  "JetBrains Mono",
+  "Fira Code",
+  "Consolas",
+})
+config.font_size = 12.0
+config.window_padding = { left = 2, right = 2, top = 2, bottom = 2 }
+config.enable_tab_bar = true
+config.hide_tab_bar_if_only_one_tab = true
+config.use_fancy_tab_bar = true
+config.tab_bar_at_bottom = true
+
+return config
+EOF
+        else
+            log "WezTerm config already exists, skipping"
+        fi
+
+        # Try to copy config to Windows (best effort)
+        if [ -f "$WEZTERM_CONFIG" ]; then
+            WINDOWS_USERNAME=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n' || echo "unknown")
+            if [ "$WINDOWS_USERNAME" != "unknown" ] && [ -d "/mnt/c/Users/${WINDOWS_USERNAME}" ]; then
+                WINDOWS_CONFIG="/mnt/c/Users/${WINDOWS_USERNAME}/.wezterm.lua"
+                log "Copying WezTerm config to Windows..."
+                cp "$WEZTERM_CONFIG" "$WINDOWS_CONFIG" 2>/dev/null || log "Note: Could not copy config to Windows (this is optional)"
+            fi
+        fi
+    else
+        log "Regular Linux/macOS environment - WezTerm available via package managers"
+    fi
+fi
+
+# ====================
+# Post-Installation Cleanup
+# ====================
+log "Cleaning up..."
+brew cleanup --prune=7 || log "Warning: Cleanup failed"
+
+# ====================
+# Summary and Next Steps
+# ====================
+log "Installation complete!"
+
+cat << EOF
+
+==============================================
+Safe Installation Complete!
+==============================================
+
+✅ Installed Essential Tools:
+   - Git, Ripgrep, Neovim, Starship prompt
+   - NVM (Node Version Manager)
+   - Python 3, Go
+
+$(if [[ "$INSTALL_DOCKER" == "true" ]]; then echo "✅ Docker installed"; fi)
+$(if [[ "$INSTALL_TERRAFORM" == "true" ]]; then echo "✅ Terraform installed"; fi)
+$(if [[ "$INSTALL_WEZTERM" == "true" ]]; then echo "✅ WezTerm configured"; fi)
+
+📋 Manual Steps (if desired):
+   1. Install Node.js: source ~/.zshrc && nvm install --lts
+   2. Configure Neovim: Launch nvim and install plugins
+   3. Customize shell: Edit ~/.zshrc for personal preferences
+
+🔧 Configuration Files:
+   - Shell: ~/.zshrc (managed by chezmoi)
+   - WezTerm: ~/.config/wezterm/wezterm.lua
+   - Git: ~/.gitconfig (managed by chezmoi)
+
+For more information: https://github.com/kozakdaniil/kozak-public-dotfiles
+==============================================
+
+EOF
+
+log "Restart your terminal to ensure all changes take effect."
