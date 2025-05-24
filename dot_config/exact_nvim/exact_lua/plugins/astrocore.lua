@@ -81,6 +81,7 @@ return {
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
         ["<Leader>b"] = { desc = "Buffers" },
+        ["<Leader>a"] = { desc = "󰚩 AI Assistant" },
         ["<leader>w"] = { "<cmd>w<cr>", desc = "Save" },
         ["<leader>q"] = { "<cmd>q<cr>", desc = "Quit" },
         ["<leader>h"] = { "<cmd>nohlsearch<cr>", desc = "No Highlight" },

@@ -39,9 +39,9 @@ end
 
 -- Useful key bindings
 config.keys = {
-  -- Split panes
+  -- Split panes (clearer bindings)
   { key = 'd', mods = 'CTRL|SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'D', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  { key = 'r', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
   
   -- Navigate panes
   { key = 'h', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
@@ -51,6 +51,19 @@ config.keys = {
   
   -- Close pane
   { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentPane { confirm = true } },
+  
+  -- Tab management
+  { key = 't', mods = 'CTRL|SHIFT', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
+  { key = 'Tab', mods = 'CTRL', action = wezterm.action.ActivateTabRelative(1) },
+  { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.ActivateTabRelative(-1) },
+  
+  -- Copy/Paste
+  { key = 'c', mods = 'CTRL|SHIFT', action = wezterm.action.CopyTo 'Clipboard' },
+  { key = 'v', mods = 'CTRL|SHIFT', action = wezterm.action.PasteFrom 'Clipboard' },
+  
+  -- Scrollback
+  { key = 'PageUp', mods = 'SHIFT', action = wezterm.action.ScrollByPage(-1) },
+  { key = 'PageDown', mods = 'SHIFT', action = wezterm.action.ScrollByPage(1) },
 }
 
 -- Mouse bindings for better copy/paste
