@@ -37,37 +37,48 @@ if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
   }
 end
 
--- Leader key configuration
-config.leader = { key = 'Space', mods = 'CTRL', timeout_milliseconds = 1000 }
-
--- Useful key bindings
+-- Useful key bindings (simplified, no leader key)
 config.keys = {
-  -- Split panes (using leader key)
-  { key = 'd', mods = 'LEADER', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'r', mods = 'LEADER', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  -- Split panes
+  { key = 'd', mods = 'ALT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'r', mods = 'ALT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
   
-  -- Navigate panes (using leader key)
-  { key = 'h', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Left' },
-  { key = 'l', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Right' },
-  { key = 'k', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Up' },
-  { key = 'j', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Down' },
+  -- Navigate panes
+  { key = 'h', mods = 'ALT', action = wezterm.action.ActivatePaneDirection 'Left' },
+  { key = 'l', mods = 'ALT', action = wezterm.action.ActivatePaneDirection 'Right' },
+  { key = 'k', mods = 'ALT', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'j', mods = 'ALT', action = wezterm.action.ActivatePaneDirection 'Down' },
   
-  -- Close pane (using leader key)
-  { key = 'w', mods = 'LEADER', action = wezterm.action.CloseCurrentPane { confirm = true } },
+  -- Close pane
+  { key = 'w', mods = 'ALT', action = wezterm.action.CloseCurrentPane { confirm = true } },
   
-  -- Tab management (using leader key)
-  { key = 't', mods = 'LEADER', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
-  { key = 'n', mods = 'LEADER', action = wezterm.action.ActivateTabRelative(1) },
-  { key = 'p', mods = 'LEADER', action = wezterm.action.ActivateTabRelative(-1) },
+  -- Tab management
+  { key = 't', mods = 'ALT', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
+  { key = 'n', mods = 'ALT', action = wezterm.action.ActivateTabRelative(1) },
+  { key = 'p', mods = 'ALT', action = wezterm.action.ActivateTabRelative(-1) },
   
-  -- AI Chat with CopilotChat
+  -- AI Chat with CopilotChat (multiple options)
   { 
     key = 'a', 
-    mods = 'LEADER', 
-    action = wezterm.action.SplitPane {
-      direction = 'Right',
-      command = { args = { 'nvim', '-c', 'CopilotChatToggle' } },
-      size = { Percent = 40 },
+    mods = 'ALT', 
+    action = wezterm.action.Multiple {
+      wezterm.action.SplitPane {
+        direction = 'Right',
+        size = { Percent = 40 },
+      },
+      wezterm.action.SendString 'nvim -c CopilotChatToggle\r',
+    }
+  },
+  
+  -- Alternative AI chat binding
+  { 
+    key = 'F12', 
+    action = wezterm.action.Multiple {
+      wezterm.action.SplitPane {
+        direction = 'Right',
+        size = { Percent = 40 },
+      },
+      wezterm.action.SendString 'nvim -c CopilotChatToggle\r',
     }
   },
   

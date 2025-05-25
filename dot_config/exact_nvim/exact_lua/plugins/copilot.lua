@@ -65,7 +65,7 @@ return {
     event = "VeryLazy",
     build = "make tiktoken", -- Only on MacOS or Linux
     opts = {
-      model = "claude-4-sonnet", -- Latest Claude 4 Sonnet (requires Enterprise)
+      model = "claude-sonner-4", -- Latest Claude 3.5 Sonnet with correct name
       temperature = 0.1,
       question_header = "## User ",
       answer_header = "## Copilot ",
