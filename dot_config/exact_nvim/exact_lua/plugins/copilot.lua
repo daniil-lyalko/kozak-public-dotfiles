@@ -37,7 +37,7 @@ return {
   -- Copilot Chat for agentic coding
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    branch = "canary",
+    branch = "main",
     dependencies = {
       { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
       { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
@@ -65,7 +65,7 @@ return {
     event = "VeryLazy",
     build = "make tiktoken", -- Only on MacOS or Linux
     opts = {
-      model = "claude-sonner-4", -- Latest Claude 3.5 Sonnet with correct name
+      model = "claude-sonnet-4", -- Latest Claude 3.5 Sonnet with correct name
       temperature = 0.1,
       question_header = "## User ",
       answer_header = "## Copilot ",

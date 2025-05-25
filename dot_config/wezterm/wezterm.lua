@@ -64,9 +64,9 @@ config.keys = {
     action = wezterm.action.Multiple {
       wezterm.action.SplitPane {
         direction = 'Right',
-        size = { Percent = 40 },
+        size = { Percent = 50 }, -- Larger pane
       },
-      wezterm.action.SendString 'nvim -c CopilotChatToggle\r',
+      wezterm.action.SendString 'nvim -c "CopilotChatToggle" /tmp/copilot_temp.md\r',
     }
   },
   
@@ -76,9 +76,9 @@ config.keys = {
     action = wezterm.action.Multiple {
       wezterm.action.SplitPane {
         direction = 'Right',
-        size = { Percent = 40 },
+        size = { Percent = 50 }, -- Larger pane
       },
-      wezterm.action.SendString 'nvim -c CopilotChatToggle\r',
+      wezterm.action.SendString 'nvim -c "CopilotChatToggle" /tmp/copilot_temp.md\r',
     }
   },
   
