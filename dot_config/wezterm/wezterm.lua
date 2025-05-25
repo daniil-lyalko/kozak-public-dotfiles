@@ -37,31 +37,45 @@ if wezterm.target_triple == 'x86_64-pc-windows-msvc' then
   }
 end
 
+-- Leader key configuration
+config.leader = { key = 'Space', mods = 'CTRL', timeout_milliseconds = 1000 }
+
 -- Useful key bindings
 config.keys = {
-  -- Split panes (clearer bindings)
-  { key = 'd', mods = 'CTRL|SHIFT', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
-  { key = 'r', mods = 'CTRL|SHIFT', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
+  -- Split panes (using leader key)
+  { key = 'd', mods = 'LEADER', action = wezterm.action.SplitHorizontal { domain = 'CurrentPaneDomain' } },
+  { key = 'r', mods = 'LEADER', action = wezterm.action.SplitVertical { domain = 'CurrentPaneDomain' } },
   
-  -- Navigate panes
-  { key = 'h', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Left' },
-  { key = 'l', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Right' },
-  { key = 'k', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Up' },
-  { key = 'j', mods = 'CTRL|SHIFT', action = wezterm.action.ActivatePaneDirection 'Down' },
+  -- Navigate panes (using leader key)
+  { key = 'h', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Left' },
+  { key = 'l', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Right' },
+  { key = 'k', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Up' },
+  { key = 'j', mods = 'LEADER', action = wezterm.action.ActivatePaneDirection 'Down' },
   
-  -- Close pane
-  { key = 'w', mods = 'CTRL|SHIFT', action = wezterm.action.CloseCurrentPane { confirm = true } },
+  -- Close pane (using leader key)
+  { key = 'w', mods = 'LEADER', action = wezterm.action.CloseCurrentPane { confirm = true } },
   
-  -- Tab management
-  { key = 't', mods = 'CTRL|SHIFT', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
-  { key = 'Tab', mods = 'CTRL', action = wezterm.action.ActivateTabRelative(1) },
-  { key = 'Tab', mods = 'CTRL|SHIFT', action = wezterm.action.ActivateTabRelative(-1) },
+  -- Tab management (using leader key)
+  { key = 't', mods = 'LEADER', action = wezterm.action.SpawnTab 'CurrentPaneDomain' },
+  { key = 'n', mods = 'LEADER', action = wezterm.action.ActivateTabRelative(1) },
+  { key = 'p', mods = 'LEADER', action = wezterm.action.ActivateTabRelative(-1) },
   
-  -- Copy/Paste
+  -- AI Chat with CopilotChat
+  { 
+    key = 'a', 
+    mods = 'LEADER', 
+    action = wezterm.action.SplitPane {
+      direction = 'Right',
+      command = { args = { 'nvim', '-c', 'CopilotChatToggle' } },
+      size = { Percent = 40 },
+    }
+  },
+  
+  -- Copy/Paste (keep standard bindings)
   { key = 'c', mods = 'CTRL|SHIFT', action = wezterm.action.CopyTo 'Clipboard' },
   { key = 'v', mods = 'CTRL|SHIFT', action = wezterm.action.PasteFrom 'Clipboard' },
   
-  -- Scrollback
+  -- Scrollback (keep standard bindings)
   { key = 'PageUp', mods = 'SHIFT', action = wezterm.action.ScrollByPage(-1) },
   { key = 'PageDown', mods = 'SHIFT', action = wezterm.action.ScrollByPage(1) },
 }
