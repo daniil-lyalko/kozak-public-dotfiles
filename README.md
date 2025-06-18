@@ -7,7 +7,7 @@ Modern cross-platform development environment configuration using [chezmoi](http
 - **Cross-platform setup:** macOS, Linux, and WSL2 support
 - **Safe installation:** Configurable package installation with safety checks  
 - **Modern shell:** Zsh + Oh My Zsh + Starship prompt
-- **Terminal:** WezTerm configuration optimized for WSL2
+- **Terminal multiplexer:** TMUX with modern Zellij-inspired UX
 - **Development tools:** Go, Python3, Node.js (via NVM), Neovim, Git with Delta
 - **Template-based:** Prompts for personal information, no hardcoded values
 - **Maintainable:** Clean, well-documented configurations
@@ -54,13 +54,13 @@ That's it! The installation script runs automatically and sets up your entire de
 ### Optional Tools (Configurable)
 - **Containers:** Docker
 - **Infrastructure:** Terraform, AWS CLI, Infracost  
-- **Terminal:** WezTerm (with WSL2 optimization)
+- **Terminal multiplexer:** TMUX (with cross-platform optimization)
 
 ### Configuration Files
 - **Git:** Modern configuration with Delta diff viewer
 - **Neovim:** Complete AstroNvim setup with LSP, formatting, linting
 - **Starship:** Custom prompt with Git integration
-- **WezTerm:** Cross-platform terminal with font fallbacks
+- **TMUX:** Modern terminal multiplexer with Zellij-inspired UX
 
 ## Customization
 
@@ -93,22 +93,23 @@ source ~/.zshrc && nvm install --lts
 nvim
 ```
 
-## WSL2 + WezTerm Setup
+## Cross-Platform Terminal Setup
 
-This configuration is optimized for WSL2 development:
+This configuration provides consistent terminal multiplexing across platforms:
 
-### WezTerm Features
-- **Font fallbacks:** JetBrains Mono → Fira Code → Consolas
-- **Theme:** Catppuccin Mocha
-- **Cross-platform consistency:** Same config on Windows/Linux/macOS
-- **WSL integration:** Automatic Windows username detection
+### TMUX Features
+- **Modern UX:** Zellij-inspired discoverable interface
+- **Theme:** Catppuccin Mocha with context-aware status bar
+- **Cross-platform:** Works with any terminal emulator
+- **Smart clipboard:** Automatic integration (clip.exe, pbcopy, xclip)
+- **Vi-style:** Intuitive navigation and copy mode
 
-### Windows Integration
+### Platform Integration
 The setup automatically:
-1. Installs WSL dependencies 
-2. Creates WezTerm config in WSL
-3. Copies config to Windows user directory
-4. Optimizes for WSL2 performance
+1. Detects platform (WSL2, macOS, Linux)
+2. Installs appropriate clipboard utilities
+3. Configures smart clipboard integration
+4. Provides session templates and layouts
 
 ## Repository Structure
 
@@ -118,7 +119,7 @@ The setup automatically:
 ├── dot_gitconfig.tmpl                 # Git configuration (templated)
 ├── dot_config/
 │   ├── starship.toml                  # Prompt configuration
-│   ├── wezterm/wezterm.lua           # Terminal configuration
+│   ├── tmux/                        # TMUX configuration and layouts
 │   └── exact_nvim/                    # Complete Neovim setup
 ├── .chezmoi.toml.tmpl                # Chezmoi configuration
 └── .chezmoiignore                    # Files to ignore

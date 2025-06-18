@@ -15,7 +15,6 @@ set -euo pipefail
 # Configuration - Set to false to skip optional installs
 INSTALL_DOCKER=${INSTALL_DOCKER:-true}
 INSTALL_TERRAFORM=${INSTALL_TERRAFORM:-true}
-INSTALL_WEZTERM=${INSTALL_WEZTERM:-true}
 INSTALL_OPTIONAL_TOOLS=${INSTALL_OPTIONAL_TOOLS:-true}
 
 # Function to log messages with timestamps
@@ -92,6 +91,7 @@ safe_brew_install "tree-sitter"
 safe_brew_install "neovim"
 safe_brew_install "starship"
 safe_brew_install "nvm"
+safe_brew_install "tmux"
 
 # Programming languages - pinned to stable versions
 safe_brew_install "python3"
@@ -142,28 +142,39 @@ if [ "${CHANGE_DEFAULT_SHELL:-false}" = "true" ] && [ "$SHELL" != "$(which zsh)"
 fi
 
 # ====================
-# WezTerm Installation (WSL-Safe)
+# Platform-Specific Dependencies
 # ====================
-if [[ "$INSTALL_WEZTERM" == "true" ]]; then
-    log "Configuring terminal environment..."
+log "Installing platform-specific dependencies..."
 
-    # Check if running in WSL
-    if grep -q -i "microsoft" /proc/version 2>/dev/null; then
-        log "WSL detected - WezTerm config managed by chezmoi"
-        
-        # Install WSL-specific dependencies if needed
-        if command_exists apt && ! command_exists wezterm; then
-            log "Installing WSL dependencies for WezTerm..."
-            if command_exists sudo; then
-                sudo apt update
-                sudo apt install -y libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-                    libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 \
-                    libxkbcommon-x11-0 || log "Warning: Some dependencies failed to install"
-            fi
-        fi
-    else
-        log "Regular Linux/macOS environment - WezTerm available via package managers"
+# Install clipboard utilities for TMUX
+if grep -q -i "microsoft" /proc/version 2>/dev/null; then
+    log "WSL detected - clipboard integration via clip.exe"
+elif command_exists apt; then
+    log "Installing clipboard utilities for Ubuntu/Debian..."
+    if command_exists sudo; then
+        sudo apt update && sudo apt install -y xclip xsel || log "Warning: Failed to install clipboard utilities"
     fi
+elif command_exists yum; then
+    log "Installing clipboard utilities for RHEL/CentOS/AL2..."
+    if command_exists sudo; then
+        sudo yum install -y xclip xsel || log "Warning: Failed to install clipboard utilities"
+    fi
+elif [ "$(uname)" = "Darwin" ]; then
+    log "macOS detected - using pbcopy/pbpaste"
+fi
+
+# ====================
+# TMUX Configuration
+# ====================
+log "Setting up TMUX environment..."
+
+# Install TMUX Plugin Manager
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    log "Installing TMUX Plugin Manager..."
+    mkdir -p "$HOME/.tmux/plugins"
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" || log "Warning: Failed to install TPM"
+else
+    log "TMUX Plugin Manager already installed."
 fi
 
 # ====================
@@ -185,22 +196,31 @@ Safe Installation Complete!
 
 ✅ Installed Essential Tools:
    - Git, Ripgrep, Neovim, Starship prompt
+   - TMUX (Terminal Multiplexer with modern config)
    - NVM (Node Version Manager)
    - Python 3, Go
 
 $(if [[ "$INSTALL_DOCKER" == "true" ]]; then echo "✅ Docker installed"; fi)
 $(if [[ "$INSTALL_TERRAFORM" == "true" ]]; then echo "✅ Terraform installed"; fi)
-$(if [[ "$INSTALL_WEZTERM" == "true" ]]; then echo "✅ WezTerm configured"; fi)
+✅ Platform-specific clipboard utilities configured
 
 📋 Manual Steps (if desired):
    1. Install Node.js: source ~/.zshrc && nvm install --lts
    2. Configure Neovim: Launch nvim and install plugins
-   3. Customize shell: Edit ~/.zshrc for personal preferences
+   3. Install TMUX plugins: tmux and press Ctrl-a + I
+   4. Customize shell: Edit ~/.zshrc for personal preferences
 
 🔧 Configuration Files:
    - Shell: ~/.zshrc (managed by chezmoi)
-   - WezTerm: ~/.config/wezterm/wezterm.lua (managed by chezmoi)
+   - TMUX: ~/.tmux.conf (managed by chezmoi)
    - Git: ~/.gitconfig (managed by chezmoi)
+   - Neovim: ~/.config/nvim/ (managed by chezmoi)
+
+🎯 TMUX Quick Start:
+   - Start TMUX: tmux
+   - Help: Ctrl-a + Ctrl-h (shows keybinding reference)
+   - Split panes: Ctrl-a + | (vertical) or Ctrl-a + - (horizontal)
+   - Navigate: Ctrl-a + h/j/k/l
 
 For more information: https://github.com/kozakdaniil/kozak-public-dotfiles
 ==============================================
