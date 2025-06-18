@@ -57,28 +57,13 @@ config.keys = {
   { key = 'n', mods = 'ALT', action = wezterm.action.ActivateTabRelative(1) },
   { key = 'p', mods = 'ALT', action = wezterm.action.ActivateTabRelative(-1) },
   
-  -- AI Chat with CopilotChat (multiple options)
+  -- Quick split for editing
   { 
     key = 'a', 
     mods = 'ALT', 
-    action = wezterm.action.Multiple {
-      wezterm.action.SplitPane {
-        direction = 'Right',
-        size = { Percent = 50 }, -- Larger pane
-      },
-      wezterm.action.SendString 'nvim -c "CopilotChatToggle" /tmp/copilot_temp.md\r',
-    }
-  },
-  
-  -- Alternative AI chat binding
-  { 
-    key = 'F12', 
-    action = wezterm.action.Multiple {
-      wezterm.action.SplitPane {
-        direction = 'Right',
-        size = { Percent = 50 }, -- Larger pane
-      },
-      wezterm.action.SendString 'nvim -c "CopilotChatToggle" /tmp/copilot_temp.md\r',
+    action = wezterm.action.SplitPane {
+      direction = 'Right',
+      size = { Percent = 50 },
     }
   },
   

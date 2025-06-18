@@ -62,21 +62,21 @@ return {
       opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, { "ts_ls", "eslint" })
     end,
   },
-  {
-    "jay-babu/mason-null-ls.nvim",
-    optional = true,
-    opts = function(_, opts)
-      opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, { "prettierd" })
-      if not opts.handlers then opts.handlers = {} end
+  -- {
+  --   "jay-babu/mason-null-ls.nvim",
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, { "prettierd" })
+  --     if not opts.handlers then opts.handlers = {} end
 
-      opts.handlers.prettierd = function(source_name, methods)
-        local null_ls = require "null-ls"
-        for _, method in ipairs(methods) do
-          null_ls.register(null_ls.builtins[method][source_name].with { condition = has_prettier })
-        end
-      end
-    end,
-  },
+  --     opts.handlers.prettierd = function(source_name, methods)
+  --       local null_ls = require "null-ls"
+  --       for _, method in ipairs(methods) do
+  --         null_ls.register(null_ls.builtins[method][source_name].with { condition = has_prettier })
+  --       end
+  --     end
+  --   end,
+  -- },
   {
     "stevearc/conform.nvim",
     optional = true,

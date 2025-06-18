@@ -1,4 +1,4 @@
--- if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
+-- User configuration is now active
 
 -- You can also add or configure plugins by creating files in this `plugins/` folder
 -- Here are some examples:
@@ -8,7 +8,11 @@ return {
 
   -- == Examples of Adding Plugins ==
 
-  "andweeb/presence.nvim",
+  -- Discord presence (configured to not require auth)
+  {
+    "andweeb/presence.nvim",
+    enabled = false, -- Disable if you don't want Discord integration
+  },
   {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
@@ -41,6 +45,9 @@ return {
 
   -- You can disable default plugins as follows:
   { "max397574/better-escape.nvim", enabled = false },
+  { "RRethy/vim-illuminate", enabled = false }, -- Disable vim-illuminate to fix none-ls conflicts
+  { "nvimtools/none-ls.nvim", enabled = false }, -- Disable none-ls completely, using conform.nvim and nvim-lint instead
+
 
   -- You can also easily customize additional setup of plugins that is outside of the plugin's setup call
   {
