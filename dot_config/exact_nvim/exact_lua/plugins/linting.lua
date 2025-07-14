@@ -3,21 +3,61 @@ return {
   event = { "BufReadPre", "BufNewFile" }, -- Lint on load
   config = function()
     local lint = require("lint")
-    lint.linters_by_ft = {
+    
+    -- Helper function to check if a linter is available
+    local function linter_exists(name)
+      local linter_config = lint.linters[name]
+      if not linter_config then return false end
+      
+      local cmd = linter_config.cmd
+      if type(cmd) == "function" then
+        -- For dynamic commands, assume it exists (will fail gracefully if not)
+        return true
+      end
+      
+      return vim.fn.executable(cmd) == 1
+    end
+    
+    -- Define linters with fallback behavior
+    local linters_by_ft = {
       python = { "flake8" },
       javascript = { "eslint_d" },
       typescript = { "eslint_d" },
       sh = { "shellcheck" },
+      bash = { "shellcheck" },
+      zsh = { "shellcheck" },
       yaml = { "yamllint" },
       -- Add more linters here as needed
       -- Ensure they are also in mason.lua ensure_installed
     }
+    
+    -- Filter out unavailable linters
+    lint.linters_by_ft = {}
+    for ft, linters in pairs(linters_by_ft) do
+      local available_linters = {}
+      for _, linter in ipairs(linters) do
+        if linter_exists(linter) then
+          table.insert(available_linters, linter)
+        else
+          vim.notify(string.format("Linter '%s' for %s is not available", linter, ft), vim.log.levels.WARN, { title = "nvim-lint" })
+        end
+      end
+      if #available_linters > 0 then
+        lint.linters_by_ft[ft] = available_linters
+      end
+    end
 
     -- Create autocommand to lint on save and on leaving insert mode
     vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
       group = vim.api.nvim_create_augroup("nvim-lint-autogroup", { clear = true }),
       callback = function()
-        require("lint").try_lint()
+        -- Safely try to lint, catching any errors
+        local ok, err = pcall(function()
+          require("lint").try_lint()
+        end)
+        if not ok then
+          vim.notify(string.format("Linting failed: %s", err), vim.log.levels.ERROR, { title = "nvim-lint" })
+        end
       end,
     })
   end,

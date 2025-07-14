@@ -17,6 +17,9 @@ return {
       },
       custom_filetypes = {},
     },
+    config = function(_, opts)
+      require("tailwind-tools").setup(opts)
+    end,
   },
   {
     "williamboman/mason-lspconfig.nvim",

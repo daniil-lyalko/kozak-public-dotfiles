@@ -90,15 +90,91 @@ alias pip=pip3
 alias venv='python -m venv'
 alias activate='source venv/bin/activate'  # Unix/macOS
 # alias activate='venv\Scripts\activate'    # Windows
+alias mkvenv='python -m venv venv && source venv/bin/activate'  # Create and activate venv in one command
+alias deactivate='deactivate 2>/dev/null || echo "No virtual environment active"'
 
-# Common Python commands
+# Smart Python app runners
+alias runpy='python -m'                    # Run Python modules: runpy flask run
+alias runflask='python -m flask run'       # Flask development server
+alias rundjango='python manage.py runserver'  # Django development server
+alias runfastapi='python -m uvicorn main:app --reload'  # FastAPI with auto-reload
+alias runstreamlit='python -m streamlit run'  # Streamlit app runner
+
+# Development shortcuts
 alias pytest='python -m pytest'
-# alias pip-upgrade='pip list --outdated --format=freeze | grep -v "^\-e" | cut -d = -f 1 | xargs -n1 pip install -U' # Consider removing or commenting this out, can be risky
+alias pyformat='python -m black . && python -m isort .'  # Format Python code
+alias pylint='python -m pylint'
+alias mypy='python -m mypy'
 alias pip-requirements='pip freeze > requirements.txt'
+alias pip-install-dev='pip install -e .'   # Install package in development mode
+
+# Python project utilities
+alias pycheck='python -m py_compile'       # Check Python syntax
+alias pydoc='python -m pydoc'             # Python documentation
+alias pyprofile='python -m cProfile'       # Python profiler
+alias pyserver='python -m http.server'     # Simple HTTP server
 
 # ----- chezmoi alias -------
 alias ca='chezmoi apply'
 alias cz='chezmoi cd'
+
+# ====================
+# Help System
+# ====================
+# Show all custom aliases and functions
+alias help='show_help'
+alias h='show_help'
+
+show_help() {
+    echo "🚀 Custom Commands & Aliases"
+    echo "=========================="
+    echo ""
+    echo "📝 Editor:"
+    echo "  v, vi, vim    - Open Neovim"
+    echo ""
+    echo "📁 Navigation:"
+    echo "  ll            - List files with details"
+    echo "  ..            - Go up one directory"
+    echo ""
+    echo "🔧 Chezmoi:"
+    echo "  ca            - Apply chezmoi changes"
+    echo "  cz            - CD to chezmoi directory"
+    echo ""
+    echo "🐍 Python:"
+    echo "  python, py    - Python 3"
+    echo "  pip           - pip3"
+    echo "  venv          - Create virtual environment"
+    echo "  activate      - Activate virtual environment"
+    echo "  mkvenv        - Create and activate venv"
+    echo "  deactivate    - Deactivate virtual environment"
+    echo ""
+    echo "🏃 Python Runners:"
+    echo "  runpy         - Run Python modules"
+    echo "  runflask      - Run Flask dev server"
+    echo "  rundjango     - Run Django dev server"
+    echo "  runfastapi    - Run FastAPI with reload"
+    echo "  runstreamlit  - Run Streamlit app"
+    echo ""
+    echo "🛠️  Python Dev Tools:"
+    echo "  pytest        - Run tests"
+    echo "  pyformat      - Format code (black + isort)"
+    echo "  pylint        - Run linter"
+    echo "  mypy          - Type checker"
+    echo "  pip-requirements - Generate requirements.txt"
+    echo "  pip-install-dev  - Install in dev mode"
+    echo ""
+    echo "🔍 Python Utilities:"
+    echo "  pycheck       - Check syntax"
+    echo "  pydoc         - Python documentation"
+    echo "  pyprofile     - Profile code"
+    echo "  pyserver      - Simple HTTP server"
+    echo ""
+    echo "🤖 AI Tools:"
+    echo "  claude        - Claude Code (auto Node v20)"
+    echo ""
+    echo "💡 Type 'alias' to see all aliases"
+    echo "💡 Type 'functions' to see all functions"
+}
 
 # ====================
 # Cross-Platform NVM Setup
@@ -152,3 +228,30 @@ fi
 
 # Load Starship prompt (ensure starship is installed via install-packages.sh)
 eval "$(starship init zsh)"
+
+# ====================
+# Claude Code Node Wrapper
+# ====================
+# Ensures Claude Code always runs with the correct Node version
+claude() {
+    # Check if nvm is available
+    if ! command -v nvm &> /dev/null; then
+        echo "Error: nvm not found. Running claude directly."
+        command claude "$@"
+        return
+    fi
+    
+    # Save current node version
+    local current_node=$(nvm current 2>/dev/null || echo "none")
+    
+    # Switch to Claude's preferred version (v20)
+    nvm use 20 &>/dev/null
+    
+    # Run Claude Code with all arguments
+    command claude "$@"
+    
+    # Restore previous version
+    if [ "$current_node" != "none" ]; then
+        nvm use "$current_node" &>/dev/null
+    fi
+}

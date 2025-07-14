@@ -39,6 +39,9 @@ return {
         tabstop = 2,
         smartindent = true,
         termguicolors = true,
+        -- Fix line endings when copying from Windows
+        fileformats = "unix,dos",
+        fixeol = true,
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
@@ -89,6 +92,24 @@ return {
       t = {
         -- setting a mapping to false will disable it
         -- ["<esc>"] = false,
+      },
+    },
+    -- Configure autocommands
+    autocmds = {
+      -- Automatically convert DOS line endings to Unix on save
+      dos2unix = {
+        {
+          event = "BufWritePre",
+          pattern = "*",
+          callback = function()
+            -- Only convert if the file has DOS line endings
+            if vim.bo.fileformat == "dos" then
+              vim.bo.fileformat = "unix"
+              vim.notify("Converted DOS line endings to Unix", vim.log.levels.INFO)
+            end
+          end,
+          desc = "Convert DOS line endings to Unix on save",
+        },
       },
     },
   },

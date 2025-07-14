@@ -13,6 +13,11 @@ return {
         "jsonls",
         "lua_ls",
         "terraformls",
+        "pyright", -- Python
+        "ts_ls", -- TypeScript/JavaScript
+        "gopls", -- Go
+        "dockerls", -- Docker
+        "docker_compose_language_service", -- Docker Compose
         -- add more arguments for adding more language servers
       })
     end,
@@ -52,6 +57,20 @@ return {
         "shfmt", -- Shell
         "yamlfmt", -- YAML
       })
+      
+      -- Configure Mason to use nvm's Node.js
+      opts.PATH = "prepend"
+      
+      -- Set up Mason to use nvm's Node path dynamically
+      local nvm_dir = vim.env.HOME .. "/.nvm"
+      if vim.fn.isdirectory(nvm_dir) == 1 then
+        -- Try to find the default Node version or any available version
+        local node_versions = vim.fn.glob(nvm_dir .. "/versions/node/*/bin", 0, 1)
+        if #node_versions > 0 then
+          -- Use the first available Node version (you might want to sort and pick latest)
+          vim.env.PATH = node_versions[#node_versions] .. ":" .. vim.env.PATH
+        end
+      end
     end,
   },
 }
