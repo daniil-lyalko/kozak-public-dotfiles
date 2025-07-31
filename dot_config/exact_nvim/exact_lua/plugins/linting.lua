@@ -19,16 +19,14 @@ return {
     end
     
     -- Define linters with fallback behavior
+    -- Only use linters that provide value beyond LSP diagnostics
     local linters_by_ft = {
-      python = { "flake8" },
-      javascript = { "eslint_d" },
-      typescript = { "eslint_d" },
-      sh = { "shellcheck" },
-      bash = { "shellcheck" },
-      zsh = { "shellcheck" },
-      yaml = { "yamllint" },
-      -- Add more linters here as needed
-      -- Ensure they are also in mason.lua ensure_installed
+      javascript = { "eslint_d" }, -- Provides style/best practices beyond ts_ls
+      typescript = { "eslint_d" }, -- Provides style/best practices beyond ts_ls
+      -- python: using pyright LSP for all diagnostics
+      -- yaml: using yamlls LSP for all diagnostics  
+      -- shell: using bashls LSP for all diagnostics
+      -- Add more linters here only if they provide unique value beyond LSP
     }
     
     -- Filter out unavailable linters

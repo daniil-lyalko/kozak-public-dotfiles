@@ -44,12 +44,38 @@ return {
     servers = {
       -- "pyright"
     },
+    -- Configure diagnostics for all LSP servers
+    diagnostics = {
+      underline = true,
+      update_in_insert = false,
+      virtual_text = {
+        spacing = 4,
+        source = "if_many",
+        prefix = "●",
+      },
+      severity_sort = true,
+    },
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
       -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
       bashls = {
         filetypes = { "sh", "bash", "zsh" },
+      },
+      lua_ls = {
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim" },
+            },
+            workspace = {
+              checkThirdParty = false,
+            },
+            completion = {
+              callSnippet = "Replace",
+            },
+          },
+        },
       },
       pyright = {
         settings = {

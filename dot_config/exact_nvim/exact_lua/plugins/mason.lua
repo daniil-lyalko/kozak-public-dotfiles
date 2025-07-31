@@ -44,16 +44,14 @@ return {
       opts.ensure_installed = opts.ensure_installed or {}
       -- Add linters and formatters here
       vim.list_extend(opts.ensure_installed, {
-        -- Linters
-        "flake8", -- Python
-        "eslint_d", -- JS/TS
-        "shellcheck", -- Shell
-        "yamllint", -- YAML
-        -- Formatters
+        -- Linters (only those providing value beyond LSP)
+        "eslint_d", -- JS/TS - provides style/best practices beyond ts_ls
+        -- Formatters (these are still needed for code formatting)
         "stylua", -- Lua
         "black", -- Python
         "isort", -- Python
-        "prettierd", -- JS/TS/Web
+        "prettier", -- JS/TS/Web/Markdown
+        "prettierd", -- JS/TS/Web/Markdown (faster)
         "shfmt", -- Shell
         "yamlfmt", -- YAML
       })
